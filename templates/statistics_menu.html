@@ -1,0 +1,31 @@
+{% extends 'template.html' %}
+
+{% block title %}
+Statistcs
+{% endblock %}
+
+{% block content %}
+<div class="container center-container">
+
+    <div class="row justify-content-center">
+        <!-- Card for View Monthly Transactions -->
+        <div class="col-md-8">
+            <div class="shadow-box text-center mb-4">
+                <h4>View Monthly Stats</h4>
+                <p>View your monthly transactions statistics in a comprehensive report.   </p>
+                <a href="{{ url_for('monthly_statistics') }}" class="btn w-100 mt-3">View Monthly Statistcs</a>
+            </div>
+        </div>
+
+        <!-- Card for View Transaction History -->
+        <div class="col-md-8">
+            <div class="shadow-box text-center mb-4">
+                <h4>View Yearly Stats</h4>
+                <p>View your yearly statistics in a comprehensive report.  </p>
+                <a href="{{ url_for('yearly_statistics') }}" class="btn w-100 mt-3">View Yearly Statistcs</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

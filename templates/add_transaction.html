@@ -1,0 +1,141 @@
+{% extends 'template.html' %}
+
+{% block title %}
+Add Transactions
+{% endblock %}
+
+{% block content %}
+    <br>
+    <!-- Filters for year and month selection -->
+    <div class="container">
+        <div class="col-md-6 col-lg-4 mx-auto">
+            <h2 class="text-center">Add a Transaction</h2>
+            <br>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('add_transaction') }}" method="post" enctype="multipart/form-data" class="p-3 shadow-sm bg-white rounded">
+                <div class="mb-3">
+                    <label for="date" class="form-label">Date:</label>
+                    <input type="date" id="date" name="date" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="type" class="form-label">Transaction Type:</label>
+                    <select id="type" name="type" class="form-select" required onchange="updateCategoryOptions()">
+                        <option value="Income">Income</option>
+                        <option value="Expense">Expense</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="category" class="form-label">Category:</label>
+                    <select id="category" name="category" class="form-select" required>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="amount" class="form-label">Amount:</label>
+                    <input type="number" id="amount" name="amount" class="form-control" step="0.01" required>
+                </div>
+                <div class="mb-3">
+                    <label for="payment_method" class="form-label">Payment Method:</label>
+                    <select id="payment_method" name="payment_method" class="form-select" required>
+                        <option value="Online Payment">Online Payment</option>
+                        <option value="Cash">Cash</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="notes" class="form-label">Notes:</label>
+                    <textarea id="notes" name="notes" class="form-control"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="bill" class="form-label">Upload Bill:</label>
+                    <input type="file" id="bill" name="bill" class="form-control" accept="image/*">
+                </div>
+                <button type="submit" class="btn btn-primary">Add Transaction</button>
+            </form>
+            <h1>Hi</h1>
+        </div>
+    </div>
+    <br>
+<script>
+    // Define the options for each type
+    const categoryOptions = {
+        Income: [
+            { value: "Salary", text: "Salary" },
+            { value: "Investments", text: "Investments" },
+            { value: "Freelancing", text: "Freelancing" },
+            { value: "Other Income", text: "Other Income" }
+        ],
+        Expense: [
+            { value: "Rent", text: "Rent" },
+            { value: "Groceries", text: "Groceries" },
+            { value: "Utilities", text: "Utilities" },
+            { value: "Education", text: "Education" },
+            { value: "Travel", text: "Travel" },
+            { value: "Entertainment", text: "Entertainment" },
+            { value: "Other Expense", text: "Other Expense" }
+        ]
+    };
+
+    // Function to update category options based on type selection
+    function updateCategoryOptions() {
+        const typeSelect = document.getElementById("type");
+        const categorySelect = document.getElementById("category");
+
+        // Get the selected type
+        const selectedType = typeSelect.value;
+
+        // Clear existing options in the category dropdown
+        categorySelect.innerHTML = "";
+
+        // Populate category dropdown with options based on the selected type
+        categoryOptions[selectedType].forEach(option => {
+            const opt = document.createElement("option");
+            opt.value = option.value;
+            opt.textContent = option.text;
+            categorySelect.appendChild(opt);
+        });
+    }
+
+    // Initialize category options on page load
+    document.addEventListener("DOMContentLoaded", updateCategoryOptions);
+
+    document.getElementById("bill").addEventListener("change", function () {
+    const billInput = this;
+    const file = billInput.files[0];
+
+    if (file) {
+        const formData = new FormData();
+        formData.append("bill", file);
+
+        // Send the image to the server for OCR processing
+        fetch("{{ url_for('process_bill') }}", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Check if OCR was successful and update the form fields
+            if (data.success) {
+                document.getElementById("date").value = data.date || "";
+                document.getElementById("amount").value = data.amount || "";
+                alert("OCR data processed. Please review before submitting.");
+            } else {
+                alert(data.message || "Failed to process the image. Please try again.");
+            }
+        })
+        .catch(error => {
+            console.error("Error processing OCR:", error);
+            alert("Error occurred while processing the bill image.");
+        });
+    }
+});
+
+
+
+</script> 
+{% endblock %}

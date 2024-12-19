@@ -1,0 +1,190 @@
+{% extends 'template.html' %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+<div class="container mt-3"> <!-- Reduced top margin -->
+
+    <!-- Welcome Message Section -->
+    <div class="row mb-3"> <!-- Reduced bottom margin -->
+        <div class="col text-center">
+            <h4>Welcome, {{ user_name }}!</h4>
+            <p class="lead">Here’s an overview of your finances for:</p>
+        </div>
+    </div>
+
+    <!-- Month and Year Selection Section -->
+    <form method="POST" action="{{ url_for('dashboard') }}">
+        <div class="row justify-content-center mb-3"> <!-- Reduced bottom margin -->
+            <div class="col-md-4 text-center">
+                <label for="monthSelect">Select Month</label>
+                <select id="monthSelect" name="month" class="form-control">
+                    <option value="1" {% if selected_month == 1 %}selected{% endif %}>January</option>
+                    <option value="2" {% if selected_month == 2 %}selected{% endif %}>February</option>
+                    <option value="3" {% if selected_month == 3 %}selected{% endif %}>March</option>
+                    <option value="4" {% if selected_month == 4 %}selected{% endif %}>April</option>
+                    <option value="5" {% if selected_month == 5 %}selected{% endif %}>May</option>
+                    <option value="6" {% if selected_month == 6 %}selected{% endif %}>June</option>
+                    <option value="7" {% if selected_month == 7 %}selected{% endif %}>July</option>
+                    <option value="8" {% if selected_month == 8 %}selected{% endif %}>August</option>
+                    <option value="9" {% if selected_month == 9 %}selected{% endif %}>September</option>
+                    <option value="10" {% if selected_month == 10 %}selected{% endif %}>October</option>
+                    <option value="11" {% if selected_month == 11 %}selected{% endif %}>November</option>
+                    <option value="12" {% if selected_month == 12 %}selected{% endif %}>December</option>
+                </select>
+            </div>
+            <div class="col-md-4 text-center">
+                <label for="yearSelect">Select Year</label>
+                <select id="yearSelect" name="year" class="form-control">
+                    {% for year in years %}
+                        <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">View</button>
+        </div>
+    </form>
+    <br>
+
+<!-- Budget and Expenses Summary Section -->
+<div class="row mb-3"> <!-- Reduced bottom margin -->
+    <div class="col-md-4 text-center"> <!-- Adjusted column size to col-md-4 for equal distribution -->
+        <h6>Your Monthly Income</h6>
+        <p id="income" class="display-6">$ {{ total_income }}</p>
+    </div>
+    <div class="col-md-4 text-center">
+        <h6>Your Monthly Budget</h6>
+        <p id="budget" class="display-6">
+            $ {{ budget }}
+            <!-- Edit link next to the budget -->
+            <a href="{{ url_for('edit_account') }}" class="btn btn-link btn-sm ml-2">Edit</a>
+        </p>
+    </div>
+    <div class="col-md-4 text-center">
+        <h6>Your Monthly Expenses</h6>
+        <p id="expense" class="display-6">$ {{ total_expenses }}</p>
+    </div>
+</div>
+
+
+    <!-- Daily Spending Chart in a Card -->
+    <div class="row justify-content-center mb-3"> <!-- Reduced bottom margin -->
+        <div class="col-md-8 d-flex justify-content-center">
+            <div class="card w-100 d-flex">
+                <div class="card-header text-center">
+                    Amount Spent Each Day of Month
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <!-- Reduced canvas size -->
+                    <canvas id="dailySpendingChart" class="flex-fill" width="250" height="60"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Chart.js Script -->
+<script>
+    // Get the selected month and year from the backend
+    const selectedMonth = JSON.parse("{{ selected_month | tojson }}");
+    const selectedYear = JSON.parse("{{ selected_year | tojson }}");
+    // Set the default selected month and year
+    document.getElementById('monthSelect').value = selectedMonth;
+    document.getElementById('yearSelect').value = selectedYear;
+
+    // Function to fetch data from Flask backend
+    function fetchDailySpendingData() {
+        // Sending data using a POST request
+        fetch('/daily_spending_data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', // Set the content type to JSON
+            },
+            body: JSON.stringify({
+                month: selectedMonth,
+                year: selectedYear
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            renderDailySpendingChart(data);
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
+    }
+
+    function renderDailySpendingChart(data) {
+        const ctx = document.getElementById('dailySpendingChart').getContext('2d');
+        
+        // Extract the year and month from the first label (assuming all labels are in the same month)
+        const firstDate = new Date(data.labels[0]);  // Get first date in "YYYY-MM-DD"
+        const year = firstDate.getFullYear();
+        const month = firstDate.getMonth();  // Month is 0-indexed
+
+        // Get the first and last date of the month
+        const firstDateOfMonth = new Date(year, month, 1);
+        const lastDateOfMonth = new Date(year, month + 1, 0); // Last day of the month
+
+        // Generate a list of all days in the month (1st to the last day)
+        const labels = [];
+        const amounts = [];
+
+        for (let date = firstDateOfMonth; date <= lastDateOfMonth; date.setDate(date.getDate() + 1)) {
+            const day = date.getDate();
+            labels.push(day.toString()); // Add day number to labels array
+            // Find the corresponding amount for the current day, if exists
+            const index = data.labels.findIndex(label => new Date(label).getDate() === day);
+            amounts.push(index >= 0 ? data.amounts[index] : 0); // Add amount if exists, otherwise 0
+        }
+
+        // Create the chart
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels, // Labels for every day in the month (1st to the last day)
+                datasets: [{
+                    label: 'Amount Spent ($)',
+                    data: amounts, // Transaction amounts for each day
+                    backgroundColor: 'rgba(210, 84, 84)',
+                    borderColor: 'rgba(210, 84, 84)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Day of the Month' // X-axis label
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Amount ($)' // Y-axis label
+                        },
+                        beginAtZero: true, // Start y-axis from zero
+                        ticks: {
+                            callback: function(value) {
+                                return `$${value.toFixed(2)}`; // Format y-axis values as dollar amounts
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Fetch data and render chart when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchDailySpendingData();
+    });
+</script>
+{% endblock %}

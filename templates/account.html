@@ -1,0 +1,63 @@
+{% extends 'template.html' %}
+
+{% block title %}
+Account
+{% endblock %}
+
+{% block content %}
+<br>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5"> <!-- Adjusted the column width -->
+            <div class="text-center">
+                <!-- Reduced image size -->
+                <img src="{{ url_for('static', filename='images/account_icon.png') }}" alt="Profile Logo" class="img-fluid rounded-circle" style="width: 80px; height: 80px;">
+            </div>
+            <br>
+            <h2 class="text-center">Personal Details</h2>
+            <br>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+              {% endfor %}
+            {% endif %}
+            {% endwith %}
+            <form action="{{ url_for('edit_account') }}" method="post" enctype="multipart/form-data" class="p-3 shadow-sm bg-white rounded"> <!-- Reduced padding -->
+                
+                <!-- First Name -->
+                <div class="mb-3">
+                    <label for="first_name" class="form-label">First Name:</label>
+                    <input type="text" id="first_name" name="first_name" class="form-control" required value="{{ user[0] }}">
+                </div>
+
+                <!-- Last Name -->
+                <div class="mb-3">
+                    <label for="last_name" class="form-label">Last Name:</label>
+                    <input type="text" id="last_name" name="last_name" class="form-control" required value="{{ user[1]}}">
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <input type="email" id="email" name="email" class="form-control" required value="{{ user[2] }}">
+                </div>
+                
+                <!-- Password -->
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password:</label>
+                    <input type="password" id="password" name="password" class="form-control" required value="{{ user[3]}}">
+                </div>
+
+                <!-- Monthly Budget -->
+                <div class="mb-3">
+                    <label for="budget" class="form-label">Monthly Budget:</label>
+                    <input type="number" id="budget" name="budget" step="0.01" class="form-control"  value="{{ user[4]}}" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</div>
+<br>
+{% endblock %}

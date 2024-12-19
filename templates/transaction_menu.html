@@ -1,0 +1,31 @@
+{% extends 'template.html' %}
+
+{% block title %}
+Dashboard - Transaction Options
+{% endblock %}
+
+{% block content %}
+<div class="container center-container">
+
+    <div class="row justify-content-center">
+        <!-- Card for View Monthly Transactions -->
+        <div class="col-md-8">
+            <div class="shadow-box text-center mb-4">
+                <h4>View Monthly Transactions</h4>
+                <p>View your monthly transactions in detail.   </p>
+                <a href="{{ url_for('view_monthly_transaction') }}" class="btn w-100 mt-3">View Monthly Transactions</a>
+            </div>
+        </div>
+
+        <!-- Card for View Transaction History -->
+        <div class="col-md-8">
+            <div class="shadow-box text-center mb-4">
+                <h4>View Transaction History</h4>
+                <p>View all your past transactions in detail.   </p>
+                <a href="{{ url_for('view_all_transactions') }}" class="btn w-100 mt-3">View Transaction History</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
