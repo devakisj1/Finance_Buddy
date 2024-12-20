@@ -11,12 +11,6 @@ A personal finance management application built with Flask and Bootstrap, allowi
 * Authentication: Flask sessions
 * Testing: unittest (Python) for backend tests
 
-
-## Setup Instructions
-### Prerequisites
-* Python 3.10.0 installed
-* SQLite 
-
 ## Features
 **1. User Authentication:** 
 
