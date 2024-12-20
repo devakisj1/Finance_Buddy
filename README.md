@@ -3,6 +3,20 @@
 
 A personal finance management application built with Flask and Bootstrap, allowing users to manage income, expenses, and visualize financial data. 
 
+
+## Tech Stack
+* Backend: Flask Framework
+* Frontend: HTML, CSS, Bootstrap
+* Database: SQLite
+* Authentication: Flask sessions
+* Testing: unittest (Python) for backend tests
+
+
+## Setup Instructions
+### Prerequisites
+* Python 3.10.0 installed
+* SQLite 
+
 ## Features
 **1. User Authentication:** 
 
@@ -37,24 +51,17 @@ A personal finance management application built with Flask and Bootstrap, allowi
 
 ![Screenshot 2024-12-20 000640](https://github.com/user-attachments/assets/42ca5e2d-9a92-44ae-8ee4-12872d0b4685)
 
-* Dashboard and Statistics: Visualize spending trends with charts.
+**3. Dashboard and Statistics:** Visualize spending trends with charts.
 
-## Tech Stack
-* Backend: Flask
-* Frontend: HTML, CSS, Bootstrap
-* Database: SQLite
-* Authentication: Flask sessions
-* Testing: unittest (Python) for backend tests
+* *__Dashboard:__*: At a glance view of the current month income and spending trends
+
+  
+![Screenshot 2024-12-20 062309](https://github.com/user-attachments/assets/ad32f213-9957-4537-94cb-44b51a4b260f)
+
+* *__Statistics__*: Visual aid to review category wise income and expense both monthly and yearly
+
+![Screenshot 2024-12-20 062610](https://github.com/user-attachments/assets/dc39a5dc-515d-4381-bfe2-7094678ef7c6)
+
+![Screenshot 2024-12-20 062815](https://github.com/user-attachments/assets/c628f178-1e06-4a41-b890-2b3a6c13fd31)
 
 
-## Setup Instructions
-### Prerequisites
-* Python 3.10.0 installed
-* SQLite 
-* IDE(eg: VSCODE)
-### Installation
-* Set up a virtual environment: Open project folder in IDE and create a python vertion 3.10.0 virtual envitonment 
-
-* Install dependencies: Run in command prompt: **pip install -r requirements.txt**
-
-* Run the application: Execute following in cmd: **flask run**
