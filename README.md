@@ -1,7 +1,7 @@
 
 # Finance Buddy
 
-A personal finance management application built with Flask and Bootstrap, allowing users to manage income, expenses, and visualize financial data. 
+A personal finance management application built with Flask and Bootstrap and OCR capabilities, allowing users to manage income, expenses, and visualize financial data. 
 
 
 ## Tech Stack
